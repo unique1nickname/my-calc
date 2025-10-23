@@ -4,9 +4,15 @@ class DLLNode:
         self.prev = prev
         self.next = next
 
+    def __repr__(self):
+        return self.value
+
 class DLL:
     def __init__(self):
         self.head = None
+
+    def __repr__(self):
+        return str(self.getList())
 
     def append(self, value):
         if self.head is None:
@@ -16,15 +22,38 @@ class DLL:
             while walk.next is not None:
                 walk = walk.next
             walk.next = DLLNode(value=value)
+            walk.next.prev = walk
 
     def getList(self):
         result = list()
         walk = self.head
-        while walk.next is not None:
+        while walk is not None:
             result.append(walk.value)
             walk = walk.next
+        
         return result
     
+    def getLen(self):
+        if self.head is None:
+            return 0
+        count = 1
+        walk = self.head
+        while walk.next is not None:
+            count += 1
+            walk = walk.next
+        return count
+
+    def get(self, i):
+        count = 0
+        walk = self.head
+        while count < i:
+            walk = walk.next
+            count += 1
+        if walk is None:
+            return None
+        return walk.value 
+
+
     def insertMathResult(self, i, result):
         if self.head is None:
             return
@@ -38,6 +67,8 @@ class DLL:
         
         if num1.prev is not None:
             num1.prev.next = walk
+        else:
+            self.head = walk
         walk.prev = num1.prev
         
         if num2.next is not None:
@@ -79,38 +110,45 @@ class Calc:
         return parsedData
 
     def getResult(self, data):
-        first_step = '^'
-        second_step = '*/'
-        third_step = '+-'
-        
-        temp_data = tuple()
+        steps = ('^', '*/', '+-')
 
-        for i in range(1, len(data)-1):
-            if data[i] in first_step:
-                result = self.doMath(data[i-1], data[i+1], data[i])
-                
-            pass
+        if data.getLen() > 1:
+            for step in steps:
+                i = 1
+                dataLen = data.getLen()
+                while i < dataLen:
+                    if data.get(i) in step:
+                        result = self.doMath(data.get(i-1), data.get(i+1), data.get(i))
+                        data.insertMathResult(i, result)
+                        dataLen = data.getLen()
+                        i = 0
+                    i += 1
+
+        return data.head.value
 
     def doMath(self, num1, num2, operator):
+        num1 = float(num1)
+        num2 = float(num2)
         match operator:
             case '^':
                 return pow(num1, num2)
             case '*':
-                return num1*num2
+                return str(num1*num2)
             case '/':
-                return num1/num2
+                return str(num1/num2)
             case '+':
-                return num1+num2
+                return str(num1+num2)
             case '-':
-                return num1-num2
+                return str(num1-num2)
             
 
 def main():
     # print('0.3'.isdigit())
     a = Calc()
-    print(a.parsingData(""))
-    print(float('2.'))
-    pass
+    data = a.parsingData("3^2*3/3+1-5")
+    print(data)
+    if data != "Invalid syntax":
+        print(a.getResult(data=data))
 
 if __name__ == "__main__":
     main()
