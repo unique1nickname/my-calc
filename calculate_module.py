@@ -59,11 +59,9 @@ def __parsingData(data: str) -> list:   # возвращает список из
             part += data[i]
         elif data[i] == '.' and '.' not in part:
             part += data[i]
-        elif data[i] in operations and i != len(data) - 1:
-            if data[i] == '-' and part == '':   # add 0 before negative number 
-                part = 0
-            elif part in ('', '.'):
-                return SYNTAX_ERROR
+        elif data[i] == '-' and part == '' and i != len(data) - 1:
+            part += data[i]
+        elif data[i] in operations and part not in ('', '.') and i != len(data) - 1:
             parsedData.append(part)
             parsedData.append(data[i])
             part = ''
@@ -97,7 +95,7 @@ def __doMath(num1, num2, operator):
     num2 = float(num2)
     match operator:
         case '^':
-            return pow(num1, num2)
+            return str(pow(num1, num2))
         case '*':
             return str(num1*num2)
         case '/':
@@ -110,6 +108,7 @@ def __doMath(num1, num2, operator):
 
 def main():
     print(calc(input()))
+    # print(calc("23223*12^(-1)"))
     # print('0.3'.isdigit())
     # print(calc("-10"))                #true
     # print(calc("qwerty"))             #false
