@@ -19,7 +19,7 @@ def calc(data: str):
                 parenthesesResult = calc(parenthesesPart)
                 if parenthesesResult == SYNTAX_ERROR:
                     return SYNTAX_ERROR
-                if parenthesesResult[0] == '-':
+                if parenthesesResult[0] == '-': # если в ответе из скобок пришло отрицательное число
                     if finalData != '' and finalData[-1] == '+':
                         finalData = finalData[:-1]
                 finalData += parenthesesResult
@@ -40,8 +40,9 @@ def calc(data: str):
         return SYNTAX_ERROR
     
     parsedData = __parsingData(finalData)
-    if parsedData != SYNTAX_ERROR:
-        return __getResult(parsedData)
+    if parsedData == SYNTAX_ERROR:
+        return SYNTAX_ERROR
+    return __getResult(parsedData)
             
 
 def __parsingData(data: str) -> list:   # возвращает список из элементов выражения
@@ -58,7 +59,11 @@ def __parsingData(data: str) -> list:   # возвращает список из
             part += data[i]
         elif data[i] == '.' and '.' not in part:
             part += data[i]
-        elif data[i] in operations and part not in ('', '.') and i != len(data) - 1:
+        elif data[i] in operations and i != len(data) - 1:
+            if data[i] == '-' and part == '':   # add 0 before negative number 
+                part = 0
+            elif part in ('', '.'):
+                return SYNTAX_ERROR
             parsedData.append(part)
             parsedData.append(data[i])
             part = ''
@@ -106,6 +111,8 @@ def __doMath(num1, num2, operator):
 def main():
     print(calc(input()))
     # print('0.3'.isdigit())
+    # print(calc("-10"))                #true
+    # print(calc("qwerty"))             #false
     # print(calc("3^(2*3)/3+1-5"))      #true
     # print(calc("(3^(2*3)/3+1-5"))     #true
     # print(calc("3^(2*3)/3+1-5)"))     #false
